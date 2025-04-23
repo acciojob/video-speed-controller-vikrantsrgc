@@ -1,86 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Video Speed Scrubber</title>
+  <meta charset="UTF-8" />
+  <title>Video Speed Controller</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background: #333;
-      color: white;
-      font-family: Arial, sans-serif;
-    }
-
-    .wrapper {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    video {
-      max-width: 100%;
-      border: 3px solid #555;
-      margin-bottom: 20px;
-    }
-
-    .speed {
-      height: 150px;
-      width: 30px;
-      background: #eee;
-      border-radius: 50px;
-      overflow: hidden;
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      position: relative;
-      cursor: pointer;
-      background: linear-gradient(to top, #f00, #0f0);
-    }
-
-    .speed-bar {
-      background: rgba(0,0,0,0.6);
-      width: 100%;
-      text-align: center;
-      color: white;
-      font-size: 14px;
-      padding: 5px 0;
-      height: 16%;
-      transition: height 0.1s;
-    }
+    .player { max-width: 750px; margin: 0 auto; }
+    .player__controls { display: flex; align-items: center; }
+    .progress { height: 8px; background: #ccc; width: 100%; cursor: pointer; }
+    .progress__filled { height: 100%; background: red; width: 0; }
+    .player__button { padding: 10px; margin: 5px; }
   </style>
 </head>
 <body>
+  <div class="player">
+    <video class="player__video viewer" src="https://www.w3schools.com/html/mov_bbb.mp4"></video>
 
-  <div class="wrapper">
-    <video class="flex" width="765" height="430" src="http://clips.vorwaerts-gmbh.de/VfE_html5.mp4" controls></video>
-    <div class="speed">
-      <div class="speed-bar">1×</div>
+    <div class="player__controls">
+      <div class="progress">
+        <div class="progress__filled"></div>
+      </div>
+      <button class="player__button toggle">►</button>
+      <button class="player__button rewind" data-skip="-10">« 10s</button>
+      <button class="player__button skip" data-skip="25">25s »</button>
     </div>
   </div>
 
   <script>
-    const speed = document.querySelector('.speed');
-    const bar = speed.querySelector('.speed-bar');
-    const video = document.querySelector('video');
+    const video = document.querySelector('.player__video');
+    const toggle = document.querySelector('.toggle');
+    const rewind = document.querySelector('.rewind');
+    const skip = document.querySelector('.skip');
+    const progress = document.querySelector('.progress');
+    const progressBar = document.querySelector('.progress__filled');
 
-    speed.addEventListener('mousemove', function (e) {
-      const y = e.pageY - this.offsetTop;
-      const percent = y / this.offsetHeight;
-      const min = 0.4;
-      const max = 4;
-      const height = Math.round(percent * 100) + '%';
-      const playbackRate = percent * (max - min) + min;
-      bar.style.height = height;
-      bar.textContent = playbackRate.toFixed(2) + '×';
-      video.playbackRate = playbackRate;
+    toggle.addEventListener('click', () => {
+      if (video.paused) {
+        video.play();
+        toggle.textContent = '❚ ❚';
+      } else {
+        video.pause();
+        toggle.textContent = '►';
+      }
+    });
+
+    rewind.addEventListener('click', () => {
+      video.currentTime -= 10;
+    });
+
+    skip.addEventListener('click', () => {
+      video.currentTime += 25;
+    });
+
+    video.addEventListener('timeupdate', () => {
+      const percent = (video.currentTime / video.duration) * 100;
+      progressBar.style.width = `${percent}%`;
     });
   </script>
 </body>
